@@ -11,23 +11,23 @@ function makeSnowflakeTexture(size = 128) {
   const ctx = c.getContext('2d')
   ctx.clearRect(0, 0, size, size)
 
-  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size * 0.5)
   g.addColorStop(0, 'rgba(255,255,255,1)')
   g.addColorStop(1, 'rgba(255,255,255,0)')
   ctx.fillStyle = g
   ctx.beginPath()
-  ctx.arc(size / 2, size / 2, size * 0.5, 0, Math.PI * 2)
+  ctx.arc(size / 2, size / 2, size * 0.45, 0, Math.PI * 2)
   ctx.fill()
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)'
-  ctx.lineWidth = Math.max(1, size * 0.03)
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+  ctx.lineWidth = Math.max(1, size * 0.02)
   ctx.lineCap = 'round'
   for (let i = 0; i < 6; i++) {
     const a = (Math.PI / 3) * i
     const x = Math.cos(a), y = Math.sin(a)
     ctx.beginPath()
     ctx.moveTo(size / 2 - x * size * 0.05, size / 2 - y * size * 0.05)
-    ctx.lineTo(size / 2 + x * size * 0.38, size / 2 + y * size * 0.38)
+    ctx.lineTo(size / 2 + x * size * 0.30, size / 2 + y * size * 0.30)
     ctx.stroke()
   }
   const tex = new THREE.CanvasTexture(c)
@@ -39,7 +39,7 @@ function makeSnowflakeTexture(size = 128) {
 }
 
 // Pretty, stable snow. On mobile we can set useSprite to true to avoid shader artifacts.
-export function Snow({ count = 2000, area = 120, speed = 0.2, minSize = 2.0, maxSize = 4.0, alpha = 0.95, soft = 0.25, useSprite = false }) {
+export function Snow({ count = 2000, area = 120, speed = 0.2, minSize = 2.0, maxSize = 4.0, alpha = 0.95, soft = 0.25, useSprite = false, spriteSize = 4 }) {
   const positions = useMemo(() => {
     const p = new Float32Array(count * 3)
     for (let i = 0; i < count; i++) {
@@ -81,13 +81,13 @@ export function Snow({ count = 2000, area = 120, speed = 0.2, minSize = 2.0, max
 
   // Sprite fallback for mobile stability
   if (useSprite) {
-    const texture = makeSnowflakeTexture(128)
+    const texture = makeSnowflakeTexture(96)
     return (
       <points ref={ref} frustumCulled={false}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         </bufferGeometry>
-        <pointsMaterial map={texture} alphaMap={texture} transparent opacity={0.9} size={8} sizeAttenuation depthWrite={false} color={new THREE.Color('#ffffff')} blending={THREE.NormalBlending} />
+        <pointsMaterial map={texture} alphaMap={texture} transparent opacity={0.85} size={spriteSize} sizeAttenuation depthWrite={false} color={new THREE.Color('#ffffff')} blending={THREE.NormalBlending} />
       </points>
     )
   }
@@ -113,4 +113,3 @@ export function Snow({ count = 2000, area = 120, speed = 0.2, minSize = 2.0, max
 }
 
 export default Snow
-
